@@ -25,6 +25,11 @@ from gherkin_objects.objects import GherkinProjectConfig, GherkinProject, Featur
 from gherkin_objects.formatter import Formatter, FormatterConfig
 
 logger = logging.getLogger(__package__)
+stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.INFO)  # Ensure it captures INFO and above
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+stream_handler.setFormatter(formatter)
+logger.addHandler(logging.StreamHandler())
 
 
 def red(string):
@@ -49,9 +54,15 @@ def apply(
             continue
 
         original_text = feature_file.text
+        feature = Feature.from_text(original_text)
+
+        if not (feature.decomposed_scenarios or feature.scenario_outlines):
+            logger.error(red(f'Invalid Gherkin: {feature_file.path}'))
+            continue
+
         formatted_text = '\n'.join(formatter.format_feature(Feature.from_text(original_text)))
         if original_text == formatted_text:
-            logger.info(f'Already formatted: {feature_file.path}')
+            logger.info(yellow(f'Already formatted: {feature_file.path}'))
         else:
             feature_file.overwrite(formatted_text)
             logger.info(green(f'Applied formatting: {feature_file.path}'))
@@ -121,6 +132,8 @@ def check(
     if unformatted_files:
         for file in unformatted_files:
             logger.error(red(f'Not formatted: {file.path}'))
+            # logger.setLevel(logging.INFO)
+            # logger.error(f'Not formatted: {file.path}')
         # Allow pipelines to fail with non-zero exit code
         sys.exit(1)
 

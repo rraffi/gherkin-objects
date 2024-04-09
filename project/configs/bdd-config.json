@@ -1,0 +1,8 @@
+{
+  "include": [
+    "../**/*.feature"
+  ],
+  "exclude": [
+    "/dev/null"
+  ]
+}

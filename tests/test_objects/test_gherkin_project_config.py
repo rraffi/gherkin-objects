@@ -30,9 +30,9 @@ class MyTestCase(unittest.TestCase):
         self.path = os.path.join(self.temp_dir, 'test.json')
         os.makedirs(self.temp_dir)
 
-    def tearDown(self) -> None:
-        if os.path.exists(self.temp_dir):
-            shutil.rmtree(self.temp_dir)
+    # def tearDown(self) -> None:
+    #     if os.path.exists(self.temp_dir):
+    #         shutil.rmtree(self.temp_dir)
 
     def test_config_sanity(self):
         config = GherkinProjectConfig(
